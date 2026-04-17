@@ -108,13 +108,20 @@
   // 2. The Initialization Fix
   window.onload = function() {
     // Start the globe instance
+    // 1. Create the instance
     world = Globe()(document.getElementById('globeViz'));
-
-    // Set properties individually to avoid the TypeError
+    
+    // 2. Set properties individually
     world.globeImageUrl(imgTopo);
     world.bumpImageUrl(imgTopo);
-    world.bumpAltitude(0.15);
-    world.baseColor('#000033');
+    
+    // Use a simple try/catch or a standalone check for the altitude
+    try {
+        world.bumpAltitude(0.15);
+    } catch(e) {
+        console.warn("Could not set bump altitude, check library version.");
+    }
+    
     world.showAtmosphere(true);
     world.atmosphereColor('lightskyblue');
     world.atmosphereAltitude(0.15);
