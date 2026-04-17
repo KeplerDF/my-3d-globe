@@ -42,33 +42,41 @@
   <div id="globeViz"></div>
 
   <script>
-    // Define our two image sets
-    const imgTopo = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
-    const imgRocks = 'https://unpkg.com/three-globe/example/img/earth-night.jpg'; // Swap with your rock_map.jpg later!
+  // 1. Define your image URLs first
+  const imgTopo = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
+  // Verified fallback for rocks until you upload your own
+  const imgRocks = 'https://unpkg.com/three-globe/example/img/earth-night.jpg';
 
-    // Initialize the Globe
-    const world = Globe()
-      (document.getElementById('globeViz'))
-      .globeImageUrl(imgTopo)
-      .bumpImageUrl(imgTopo)
-      .bumpAltitude(0.1)
-      .showAtmosphere(true)
-      .atmosphereColor('lightskyblue');
+  // 2. Initialize the globe correctly
+  // Note: We use .globeImageUrl and .bumpImageUrl as separate calls
+  const world = Globe()(document.getElementById('globeViz'))
+    .globeImageUrl(imgTopo)
+    .bumpImageUrl(imgTopo)
+    .bumpAltitude(0.15)
+    .showAtmosphere(true)
+    .atmosphereColor('lightskyblue')
+    .atmosphereAltitude(0.15);
 
-    world.controls().autoRotate = true;
+  // 3. Set properties that don't need to be chained
+  world.controls().autoRotate = true;
+  world.controls().autoRotateSpeed = 0.5;
 
-    // Function to switch to Topography view
-    function showTopo() {
-      world.globeImageUrl(imgTopo);
-      console.log("Switched to Topo view");
-    }
+  // 4. These functions now wait until world is defined
+  function showTopo() {
+    console.log("Switching to Topo...");
+    world.globeImageUrl(imgTopo);
+    world.bumpImageUrl(imgTopo);
+  }
 
-    // Function to switch to Rock Type view
-    function showRocks() {
-      // If you use your rock_map.jpg, ensure it's uploaded to GitHub!
-      world.globeImageUrl(imgRocks); 
-      console.log("Switched to Rock view");
-    }
-  </script>
+  function showRocks() {
+    console.log("Switching to Rocks...");
+    // If you have a local file named 'rock_map.jpg', change this line to:
+    // world.globeImageUrl('rock_map.jpg');
+    world.globeImageUrl(imgRocks);
+    
+    // We keep the topo bump so the rocks look 3D!
+    world.bumpImageUrl(imgTopo); 
+  }
+</script>
 </body>
 </html>
