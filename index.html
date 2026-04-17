@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="//unpkg.com/globe.gl"></script>
+  <style> body { margin: 0; background-color: #000; } </style>
+  <script src="https://unpkg.com/globe.gl"></script>
 </head>
 <body>
   <div id="globeViz"></div>
@@ -9,10 +10,11 @@
   <script>
     const world = Globe()
       (document.getElementById('globeViz'))
-      // This is the GEBCO Colorful Shaded Relief image
+      // Updated GEBCO link with explicit HTTPS and parameters
       .globeImageUrl('https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?request=getmap&service=wms&BBOX=-90,-180,90,180&crs=EPSG:4326&format=image/jpeg&layers=gebco_latest&width=1200&height=600')
       .backgroundColor('#000011')
-      .showAtmosphere(true);
+      .showAtmosphere(true)
+      .atmosphereColor('lightskyblue');
   </script>
 </body>
 </html>
