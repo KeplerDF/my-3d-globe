@@ -15,11 +15,11 @@
   <div id="globeViz"></div>
 
   <script>
-    world
-  .onGlobeClick(({ lat, lng }) => {
-      alert(`You clicked at Latitude: ${lat}, Longitude: ${lng}`);
-  });
     const world = Globe()
+      world
+        .onGlobeClick(({ lat, lng }) => {
+            alert(`You clicked at Latitude: ${lat}, Longitude: ${lng}`);
+        });
       (document.getElementById('globeViz'))
       // This tells the globe to look for the file in your GitHub folder
       .globeImageUrl('./world_topo.jpg') 
