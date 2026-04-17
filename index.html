@@ -39,6 +39,32 @@
     <button onclick="showRocks()">Rock Types (Lithology)</button>
   </div>
 
+  <div id="legend">
+  <h4 id="legendTitle">Elevation</h4>
+  <div id="legendContent">
+    </div>
+</div>
+
+  <style>
+    #legend {
+      position: absolute;
+      bottom: 30px;
+      right: 20px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      border-radius: 10px;
+      border: 1px solid #444;
+      font-family: sans-serif;
+      z-index: 20;
+      min-width: 180px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .legend-item { display: flex; align-items: center; margin-bottom: 6px; font-size: 13px; }
+    .color-box { width: 16px; height: 16px; margin-right: 10px; border: 1px solid #fff; }
+  </style>
+
   <div id="globeViz"></div>
 
   <script>
@@ -65,18 +91,47 @@
   world.controls().autoRotate = true;
   world.controls().autoRotateSpeed = 0.5;
 
-  // 5. Functions - Now they will find 'world' correctly
-  function showTopo() {
-    console.log("Switching to Topo...");
-    world.globeImageUrl(imgTopo);
-    world.bumpImageUrl(imgTopo);
-  }
+  // Define the data for the Rock Types (based on your Classnames.txt)
+const rockKey = [
+  { color: '#FFD700', label: 'su: Unconsolidated Sediments' },
+  { color: '#8B0000', label: 'vb: Basic Volcanic (Basalt)' },
+  { color: '#FFA500', label: 'ss: Siliciclastic Sedimentary' },
+  { color: '#00FF00', label: 'sc: Carbonate (Limestone)' },
+  { color: '#FF00FF', label: 'pa: Acid Plutonic (Granite)' },
+  { color: '#808080', label: 'mt: Metamorphic' },
+  { color: '#0000FF', label: 'wb: Water Bodies' }
+];
 
-  function showRocks() {
-  console.log("Loading custom GLiM texture...");
-  world.globeImageUrl('rock_map.png'); // Your exported QGIS file
-    world.bumpImageUrl(imgTopo);
-  }
+function updateLegend(title, items) {
+  document.getElementById('legendTitle').innerText = title;
+  const container = document.getElementById('legendContent');
+  container.innerHTML = ''; // Clear old legend
+
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'legend-item';
+    div.innerHTML = `<div class="color-box" style="background: ${item.color}"></div><span>${item.label}</span>`;
+    container.appendChild(div);
+  });
+}
+
+// Update your button functions to call the legend update
+function showTopo() {
+  world.globeImageUrl(imgTopo).bumpImageUrl(imgTopo);
+  updateLegend('Terrain View', [
+    { color: '#228B22', label: 'Lowlands' },
+    { color: '#A0522D', label: 'Mountains' },
+    { color: '#FFFFFF', label: 'Ice / Snow' }
+  ]);
+}
+
+function showRocks() {
+  world.globeImageUrl('rock_map.png').bumpImageUrl(imgTopo);
+  updateLegend('Global Lithology (GLiM)', rockKey);
+}
+
+// Initialize the first legend on load
+showTopo();
 </script>
 </body>
 </html>
