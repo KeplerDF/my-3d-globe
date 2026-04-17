@@ -5,9 +5,41 @@
   <title>Interactive Geological Globe</title>
   <style>
     body { margin: 0; background: #000; font-family: sans-serif; }
+    <div id="legend">
+      <h4 id="legendTitle" style="margin-top:0; margin-bottom:10px;">Elevation</h4>
+      <div id="legendContent"></div>
+    </div>
+
+<div id="globeViz"></div>
     #globeViz { width: 100vw; height: 100vh; }
     
-    /* This styles the toggle button UI */
+    #legend {
+      position: absolute;
+      bottom: 30px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8); /* Dark background like CEN Hamburg */
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: sans-serif;
+      z-index: 1000; /* High number ensures it stays on top */
+      border: 1px solid #555;
+      pointer-events: none; /* Allows you to rotate globe even if mouse is over legend */
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    
+    .color-box {
+      width: 14px;
+      height: 14px;
+      margin-right: 8px;
+      border: 1px solid #fff;
+    }
+    
     #controls {
       position: absolute;
       top: 20px;
@@ -71,12 +103,36 @@
   // 1. Define your image URLs first
   const imgTopo = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
   // Verified fallback for rocks until you upload your own
-  const imgRocks = 'https://unpkg.com/three-globe@2.45.2/example/img/earth-night.jpg';
+  const imgRocks = 'rock_map.png');
 
   // 2. Initialize the globe correctly
   // Note: We use .globeImageUrl and .bumpImageUrl as separate calls
   // 2. Create the globe instance FIRST
-  const world = Globe()(document.getElementById('globeViz'));
+  window.onload = function() {
+  // Initialize the globe inside here
+  const world = Globe()(document.getElementById('globeViz'))
+    .globeImageUrl(imgTopo)
+    .bumpImageUrl(imgTopo)
+    .bumpAltitude(0.15);
+
+  // Define functions globally so buttons can see them
+  window.showTopo = function() {
+    world.globeImageUrl(imgTopo);
+    updateLegend('Terrain View', [
+      { color: '#228B22', label: 'Lowlands' },
+      { color: '#A0522D', label: 'Mountains' },
+      { color: '#FFFFFF', label: 'Ice / Snow' }
+    ]);
+  };
+
+  window.showRocks = function() {
+    world.globeImageUrl(imgRocks);
+    updateLegend('Global Lithology (GLiM)', rockKey);
+  };
+
+  // Run the first legend update
+  showTopo();
+};
 
   // 3. Configure the globe line-by-line (prevents the TypeError)
   world.globeImageUrl(imgTopo);
