@@ -4,42 +4,11 @@
   <meta charset="UTF-8">
   <title>Interactive Geological Globe</title>
   <style>
-    body { margin: 0; background: #000; font-family: sans-serif; }
-    <div id="legend">
-      <h4 id="legendTitle" style="margin-top:0; margin-bottom:10px;">Elevation</h4>
-      <div id="legendContent"></div>
-    </div>
-
-<div id="globeViz"></div>
+    /* 1. LAYOUT & THEME */
+    body { margin: 0; background: #000; font-family: sans-serif; overflow: hidden; }
     #globeViz { width: 100vw; height: 100vh; }
-    
-    #legend {
-      position: absolute;
-      bottom: 30px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.8); /* Dark background like CEN Hamburg */
-      color: white;
-      padding: 15px;
-      border-radius: 8px;
-      font-family: sans-serif;
-      z-index: 1000; /* High number ensures it stays on top */
-      border: 1px solid #555;
-      pointer-events: none; /* Allows you to rotate globe even if mouse is over legend */
-    }
-    
-    .legend-item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 5px;
-    }
-    
-    .color-box {
-      width: 14px;
-      height: 14px;
-      margin-right: 8px;
-      border: 1px solid #fff;
-    }
-    
+
+    /* 2. CONTROLS (Top Left) */
     #controls {
       position: absolute;
       top: 20px;
@@ -49,8 +18,9 @@
       color: white;
       border-radius: 8px;
       border: 1px solid #444;
-      z-index: 10;
+      z-index: 100;
     }
+    #controls h3 { margin: 0 0 10px 0; font-size: 16px; }
     button {
       cursor: pointer;
       padding: 8px 12px;
@@ -58,8 +28,27 @@
       color: white;
       border: 1px solid #666;
       border-radius: 4px;
+      margin-right: 5px;
     }
     button:hover { background: #555; }
+
+    /* 3. LEGEND (Bottom Right) */
+    #legend {
+      position: absolute;
+      bottom: 30px;
+      right: 20px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      border-radius: 10px;
+      border: 1px solid #555;
+      z-index: 100;
+      min-width: 200px;
+      pointer-events: none; /* Allows interacting with globe behind legend */
+    }
+    #legend h4 { margin: 0 0 10px 0; border-bottom: 1px solid #444; padding-bottom: 5px; }
+    .legend-item { display: flex; align-items: center; margin-bottom: 6px; font-size: 13px; }
+    .color-box { width: 14px; height: 14px; margin-right: 10px; border: 1px solid #fff; flex-shrink: 0; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
 </head>
@@ -72,122 +61,74 @@
   </div>
 
   <div id="legend">
-  <h4 id="legendTitle">Elevation</h4>
-  <div id="legendContent">
-    </div>
-</div>
-
-  <style>
-    #legend {
-      position: absolute;
-      bottom: 30px;
-      right: 20px;
-      padding: 15px;
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      border-radius: 10px;
-      border: 1px solid #444;
-      font-family: sans-serif;
-      z-index: 20;
-      min-width: 180px;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-    .legend-item { display: flex; align-items: center; margin-bottom: 6px; font-size: 13px; }
-    .color-box { width: 16px; height: 16px; margin-right: 10px; border: 1px solid #fff; }
-  </style>
+    <h4 id="legendTitle">Elevation</h4>
+    <div id="legendContent"></div>
+  </div>
 
   <div id="globeViz"></div>
 
   <script>
-  // 1. Define your image URLs first
-  const imgTopo = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
-  // Verified fallback for rocks until you upload your own
-  const imgRocks = 'rock_map.png');
+    // --- CONFIGURATION ---
+    const imgTopo = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
+    const imgRocks = 'rock_map.png';
 
-  // 2. Initialize the globe correctly
-  // Note: We use .globeImageUrl and .bumpImageUrl as separate calls
-  // 2. Create the globe instance FIRST
-  window.onload = function() {
-  // Initialize the globe inside here
-  const world = Globe()(document.getElementById('globeViz'))
-    .globeImageUrl(imgTopo)
-    .bumpImageUrl(imgTopo)
-    .bumpAltitude(0.15);
+    const rockKey = [
+      { color: '#FFD700', label: 'su: Unconsolidated Sediments' },
+      { color: '#8B0000', label: 'vb: Basic Volcanic (Basalt)' },
+      { color: '#FFA500', label: 'ss: Siliciclastic Sedimentary' },
+      { color: '#00FF00', label: 'sc: Carbonate (Limestone)' },
+      { color: '#FF00FF', label: 'pa: Acid Plutonic (Granite)' },
+      { color: '#808080', label: 'mt: Metamorphic' },
+      { color: '#0000FF', label: 'wb: Water Bodies' }
+    ];
 
-  // Define functions globally so buttons can see them
-  window.showTopo = function() {
-    world.globeImageUrl(imgTopo);
-    updateLegend('Terrain View', [
-      { color: '#228B22', label: 'Lowlands' },
-      { color: '#A0522D', label: 'Mountains' },
-      { color: '#FFFFFF', label: 'Ice / Snow' }
-    ]);
-  };
+    let world; // Global variable to hold the globe instance
 
-  window.showRocks = function() {
-    world.globeImageUrl(imgRocks);
-    updateLegend('Global Lithology (GLiM)', rockKey);
-  };
+    // --- CORE FUNCTIONS ---
+    function updateLegend(title, items) {
+      document.getElementById('legendTitle').innerText = title;
+      const container = document.getElementById('legendContent');
+      container.innerHTML = items.map(item => `
+        <div class="legend-item">
+          <div class="color-box" style="background: ${item.color}"></div>
+          <span>${item.label}</span>
+        </div>
+      `).join('');
+    }
 
-  // Run the first legend update
-  showTopo();
-};
+    function showTopo() {
+      if (!world) return;
+      world.globeImageUrl(imgTopo).bumpImageUrl(imgTopo);
+      updateLegend('Terrain View', [
+        { color: '#228B22', label: 'Lowlands' },
+        { color: '#A0522D', label: 'Mountains' },
+        { color: '#FFFFFF', label: 'Ice / Snow' }
+      ]);
+    }
 
-  // 3. Configure the globe line-by-line (prevents the TypeError)
-  world.globeImageUrl(imgTopo);
-  world.baseColor('#000033'); // Dark blue for the oceans
-  world.bumpImageUrl(imgTopo);
-  world.bumpAltitude(0.15);
-  world.showAtmosphere(true);
-  world.atmosphereColor('lightskyblue');
-  world.atmosphereAltitude(0.15);
+    function showRocks() {
+      if (!world) return;
+      world.globeImageUrl(imgRocks).bumpImageUrl(imgTopo);
+      updateLegend('Global Lithology (GLiM)', rockKey);
+    }
 
-  // 4. Set controls
-  world.controls().autoRotate = true;
-  world.controls().autoRotateSpeed = 0.5;
+    // --- INITIALIZATION ---
+    window.onload = function() {
+      world = Globe()(document.getElementById('globeViz'))
+        .globeImageUrl(imgTopo)
+        .bumpImageUrl(imgTopo)
+        .bumpAltitude(0.15)
+        .baseColor('#000033')
+        .showAtmosphere(true)
+        .atmosphereColor('lightskyblue')
+        .atmosphereAltitude(0.15);
 
-  // Define the data for the Rock Types (based on your Classnames.txt)
-const rockKey = [
-  { color: '#FFD700', label: 'su: Unconsolidated Sediments' },
-  { color: '#8B0000', label: 'vb: Basic Volcanic (Basalt)' },
-  { color: '#FFA500', label: 'ss: Siliciclastic Sedimentary' },
-  { color: '#00FF00', label: 'sc: Carbonate (Limestone)' },
-  { color: '#FF00FF', label: 'pa: Acid Plutonic (Granite)' },
-  { color: '#808080', label: 'mt: Metamorphic' },
-  { color: '#0000FF', label: 'wb: Water Bodies' }
-];
+      world.controls().autoRotate = true;
+      world.controls().autoRotateSpeed = 0.5;
 
-function updateLegend(title, items) {
-  document.getElementById('legendTitle').innerText = title;
-  const container = document.getElementById('legendContent');
-  container.innerHTML = ''; // Clear old legend
-
-  items.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'legend-item';
-    div.innerHTML = `<div class="color-box" style="background: ${item.color}"></div><span>${item.label}</span>`;
-    container.appendChild(div);
-  });
-}
-
-// Update your button functions to call the legend update
-function showTopo() {
-  world.globeImageUrl(imgTopo).bumpImageUrl(imgTopo);
-  updateLegend('Terrain View', [
-    { color: '#228B22', label: 'Lowlands' },
-    { color: '#A0522D', label: 'Mountains' },
-    { color: '#FFFFFF', label: 'Ice / Snow' }
-  ]);
-}
-
-function showRocks() {
-  world.globeImageUrl('rock_map.png').bumpImageUrl(imgTopo);
-  updateLegend('Global Lithology (GLiM)', rockKey);
-}
-
-// Initialize the first legend on load
-showTopo();
-</script>
+      // Set initial view
+      showTopo();
+    };
+  </script>
 </body>
 </html>
