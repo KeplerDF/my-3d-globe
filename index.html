@@ -13,25 +13,22 @@
   <div id="globeViz"></div>
 
   <script>
-    // 1. Initialize the globe
-    const myGlobe = Globe();
+  // Initialize the globe correctly
+  const world = Globe()
+    (document.getElementById('globeViz'))
+    .globeImageUrl('world_topo.jpg') // This handles the "color" via the image
+    .showAtmosphere(true)
+    .atmosphereColor('lightskyblue')
+    .atmosphereAltitude(0.15);
 
-    // 2. Configure it
-    myGlobe(document.getElementById('globeViz'))
-      // Use a solid color first to see if it renders
-      .globeColor('#333333') 
-      // Use a reliable, standard Earth image
-      .globeImageUrl('https://cdn.jsdelivr.net/gh/vasturiano/globe.gl/example/img/earth-night.jpg')
-      //.bumpImageUrl('world_topo.jpg')
-      //.bumpAltitude(0.1) // This creates the 3D "feel" of mountains
-      .showAtmosphere(true)
-      .atmosphereColor('lightskyblue');
+  // Setup controls separately to avoid chaining errors
+  world.controls().autoRotate = true;
+  world.controls().autoRotateSpeed = 0.5;
 
-    // 3. Add movement
-    myGlobe.controls().autoRotate = true;
-    myGlobe.controls().autoRotateSpeed = 0.5;
-
-    console.log("Globe script finished loading!");
-  </script>
+  // Add the click listener
+  world.onGlobeClick(({ lat, lng }) => {
+      alert(`Latitude: ${lat}, Longitude: ${lng}`);
+  });
+</script>
 </body>
 </html>
