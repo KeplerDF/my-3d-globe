@@ -49,19 +49,22 @@
 
   // 2. Initialize the globe correctly
   // Note: We use .globeImageUrl and .bumpImageUrl as separate calls
-  const world = Globe()(document.getElementById('globeViz'))
-    .globeImageUrl(imgTopo)
-    .bumpImageUrl(imgTopo)
-    .bumpAltitude(0.15)
-    .showAtmosphere(true)
-    .atmosphereColor('lightskyblue')
-    .atmosphereAltitude(0.15);
+  // 2. Create the globe instance FIRST
+  const world = Globe()(document.getElementById('globeViz'));
 
-  // 3. Set properties that don't need to be chained
+  // 3. Configure the globe line-by-line (prevents the TypeError)
+  world.globeImageUrl(imgTopo);
+  world.bumpImageUrl(imgTopo);
+  world.bumpAltitude(0.15);
+  world.showAtmosphere(true);
+  world.atmosphereColor('lightskyblue');
+  world.atmosphereAltitude(0.15);
+
+  // 4. Set controls
   world.controls().autoRotate = true;
   world.controls().autoRotateSpeed = 0.5;
 
-  // 4. These functions now wait until world is defined
+  // 5. Functions - Now they will find 'world' correctly
   function showTopo() {
     console.log("Switching to Topo...");
     world.globeImageUrl(imgTopo);
@@ -70,12 +73,9 @@
 
   function showRocks() {
     console.log("Switching to Rocks...");
-    // If you have a local file named 'rock_map.jpg', change this line to:
-    // world.globeImageUrl('rock_map.jpg');
     world.globeImageUrl(imgRocks);
-    
-    // We keep the topo bump so the rocks look 3D!
-    world.bumpImageUrl(imgTopo); 
+    // We keep the topography bump so the rock map has texture
+    world.bumpImageUrl(imgTopo);
   }
 </script>
 </body>
