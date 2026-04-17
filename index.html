@@ -4,11 +4,9 @@
   <meta charset="UTF-8">
   <title>Interactive Geological Globe</title>
   <style>
-    /* 1. LAYOUT & THEME */
     body { margin: 0; background: #000; font-family: sans-serif; overflow: hidden; }
     #globeViz { width: 100vw; height: 100vh; }
 
-    /* 2. CONTROLS (Top Left) */
     #controls {
       position: absolute;
       top: 20px;
@@ -20,19 +18,7 @@
       border: 1px solid #444;
       z-index: 100;
     }
-    #controls h3 { margin: 0 0 10px 0; font-size: 16px; }
-    button {
-      cursor: pointer;
-      padding: 8px 12px;
-      background: #333;
-      color: white;
-      border: 1px solid #666;
-      border-radius: 4px;
-      margin-right: 5px;
-    }
-    button:hover { background: #555; }
 
-    /* 3. LEGEND (Bottom Right) */
     #legend {
       position: absolute;
       bottom: 30px;
@@ -44,13 +30,14 @@
       border: 1px solid #555;
       z-index: 100;
       min-width: 200px;
-      pointer-events: none; /* Allows interacting with globe behind legend */
+      pointer-events: none;
     }
-    #legend h4 { margin: 0 0 10px 0; border-bottom: 1px solid #444; padding-bottom: 5px; }
+
     .legend-item { display: flex; align-items: center; margin-bottom: 6px; font-size: 13px; }
-    .color-box { width: 14px; height: 14px; margin-right: 10px; border: 1px solid #fff; flex-shrink: 0; }
+    .color-box { width: 14px; height: 14px; margin-right: 10px; border: 1px solid #fff; }
+    button { cursor: pointer; padding: 8px 12px; background: #333; color: white; border: 1px solid #666; border-radius: 4px; margin-right: 5px; }
+    button:hover { background: #555; }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
 </head>
 <body>
 
@@ -61,16 +48,17 @@
   </div>
 
   <div id="legend">
-    <h4 id="legendTitle">Elevation</h4>
+    <h4 id="legendTitle" style="margin:0 0 10px 0;">Elevation</h4>
     <div id="legendContent"></div>
   </div>
 
   <div id="globeViz"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
   <script>
-    // --- CONFIGURATION ---
+    // 1. Setup Variables
     const imgTopo = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
-    const imgRocks = 'rock_map.png';
+    const imgRocks = 'rock_map.png'; // Make sure this file name is exact!
 
     const rockKey = [
       { color: '#FFD700', label: 'su: Unconsolidated Sediments' },
@@ -82,9 +70,9 @@
       { color: '#0000FF', label: 'wb: Water Bodies' }
     ];
 
-    let world; // Global variable to hold the globe instance
+    let world; // This must be outside so functions can see it
 
-    // --- CORE FUNCTIONS ---
+    // 2. The Logic Functions
     function updateLegend(title, items) {
       document.getElementById('legendTitle').innerText = title;
       const container = document.getElementById('legendContent');
@@ -97,22 +85,24 @@
     }
 
     function showTopo() {
-      if (!world) return;
-      world.globeImageUrl(imgTopo).bumpImageUrl(imgTopo);
-      updateLegend('Terrain View', [
-        { color: '#228B22', label: 'Lowlands' },
-        { color: '#A0522D', label: 'Mountains' },
-        { color: '#FFFFFF', label: 'Ice / Snow' }
-      ]);
+      if(world) {
+        world.globeImageUrl(imgTopo);
+        updateLegend('Terrain View', [
+          { color: '#228B22', label: 'Lowlands' },
+          { color: '#A0522D', label: 'Mountains' },
+          { color: '#FFFFFF', label: 'Ice / Snow' }
+        ]);
+      }
     }
 
     function showRocks() {
-      if (!world) return;
-      world.globeImageUrl(imgRocks).bumpImageUrl(imgTopo);
-      updateLegend('Global Lithology (GLiM)', rockKey);
+      if(world) {
+        world.globeImageUrl(imgRocks);
+        updateLegend('Global Lithology (GLiM)', rockKey);
+      }
     }
 
-    // --- INITIALIZATION ---
+    // 3. Initialize on Load
     window.onload = function() {
       world = Globe()(document.getElementById('globeViz'))
         .globeImageUrl(imgTopo)
@@ -126,7 +116,7 @@
       world.controls().autoRotate = true;
       world.controls().autoRotateSpeed = 0.5;
 
-      // Set initial view
+      // Start with Topo view
       showTopo();
     };
   </script>
