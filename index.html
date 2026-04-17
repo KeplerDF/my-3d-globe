@@ -17,20 +17,17 @@
   <script>
     const world = Globe()
       (document.getElementById('globeViz'))
-      // This tells the globe to look for the file in your GitHub folder
-      .globeImageUrl('./my-3d-globe/world_topo.jpg')
+      // This looks for the image in the SAME folder as this HTML file
+      .globeImageUrl('world_topo.jpg') 
       .backgroundColor('#000011')
       .showAtmosphere(true)
       .atmosphereColor('lightskyblue')
       .atmosphereAltitude(0.15);
 
-    
-    world
-        .onGlobeClick(({ lat, lng }) => {
-            alert(`You clicked at Latitude: ${lat}, Longitude: ${lng}`);
-        });
+    world.onGlobeClick(({ lat, lng }) => {
+        alert(`You clicked at Latitude: ${lat}, Longitude: ${lng}`);
+    });
 
-    // Optional: Add auto-rotation
     world.controls().autoRotate = true;
     world.controls().autoRotateSpeed = 0.5;
   </script>
