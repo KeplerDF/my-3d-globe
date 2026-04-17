@@ -123,8 +123,9 @@
     }
     
     world.showAtmosphere(true);
-    world.atmosphereColor('lightskyblue');
-    world.atmosphereAltitude(0.15);
+    world.atmosphereColor('rgba(255,255,255,0.5)'); // Soft white haze
+    world.atmosphereAltitude(0.1);
+    world.shininess(0.05); // Makes the globe surface slightly matte (better for rocks)
 
     // Controls
     world.controls().autoRotate = true;
