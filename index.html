@@ -55,70 +55,77 @@
   <div id="globeViz"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
-  <script>
-    // 1. Setup Variables
-    const imgTopo = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
-    const imgRocks = 'rock_map.png'; // Make sure this file name is exact!
+<script>
+  // 1. Setup Variables
+  const imgTopo = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
+  const imgRocks = 'rock_map.png';
 
-    const rockKey = [
-      { color: '#FFD700', label: 'su: Unconsolidated Sediments' },
-      { color: '#8B0000', label: 'vb: Basic Volcanic (Basalt)' },
-      { color: '#FFA500', label: 'ss: Siliciclastic Sedimentary' },
-      { color: '#00FF00', label: 'sc: Carbonate (Limestone)' },
-      { color: '#FF00FF', label: 'pa: Acid Plutonic (Granite)' },
-      { color: '#808080', label: 'mt: Metamorphic' },
-      { color: '#0000FF', label: 'wb: Water Bodies' }
-    ];
+  const rockKey = [
+    { color: '#FFD700', label: 'su: Unconsolidated Sediments' },
+    { color: '#8B0000', label: 'vb: Basic Volcanic (Basalt)' },
+    { color: '#FFA500', label: 'ss: Siliciclastic Sedimentary' },
+    { color: '#00FF00', label: 'sc: Carbonate (Limestone)' },
+    { color: '#FF00FF', label: 'pa: Acid Plutonic (Granite)' },
+    { color: '#808080', label: 'mt: Metamorphic' },
+    { color: '#0000FF', label: 'wb: Water Bodies' }
+  ];
 
-    let world; // This must be outside so functions can see it
+  let world; 
 
-    // 2. The Logic Functions
-    function updateLegend(title, items) {
-      document.getElementById('legendTitle').innerText = title;
-      const container = document.getElementById('legendContent');
-      container.innerHTML = items.map(item => `
-        <div class="legend-item">
-          <div class="color-box" style="background: ${item.color}"></div>
-          <span>${item.label}</span>
-        </div>
-      `).join('');
+  function updateLegend(title, items) {
+    const titleElem = document.getElementById('legendTitle');
+    const container = document.getElementById('legendContent');
+    if (!titleElem || !container) return;
+
+    titleElem.innerText = title;
+    container.innerHTML = items.map(item => `
+      <div class="legend-item">
+        <div class="color-box" style="background: ${item.color}"></div>
+        <span>${item.label}</span>
+      </div>
+    `).join('');
+  }
+
+  // Define these globally so buttons can find them
+  window.showTopo = function() {
+    if (world) {
+      world.globeImageUrl(imgTopo);
+      updateLegend('Terrain View', [
+        { color: '#228B22', label: 'Lowlands' },
+        { color: '#A0522D', label: 'Mountains' },
+        { color: '#FFFFFF', label: 'Ice / Snow' }
+      ]);
     }
+  };
 
-    function showTopo() {
-      if(world) {
-        world.globeImageUrl(imgTopo);
-        updateLegend('Terrain View', [
-          { color: '#228B22', label: 'Lowlands' },
-          { color: '#A0522D', label: 'Mountains' },
-          { color: '#FFFFFF', label: 'Ice / Snow' }
-        ]);
-      }
+  window.showRocks = function() {
+    if (world) {
+      world.globeImageUrl(imgRocks);
+      updateLegend('Global Lithology (GLiM)', rockKey);
     }
+  };
 
-    function showRocks() {
-      if(world) {
-        world.globeImageUrl(imgRocks);
-        updateLegend('Global Lithology (GLiM)', rockKey);
-      }
-    }
+  // 2. The Initialization Fix
+  window.onload = function() {
+    // Start the globe instance
+    world = Globe()(document.getElementById('globeViz'));
 
-    // 3. Initialize on Load
-    window.onload = function() {
-      world = Globe()(document.getElementById('globeViz'))
-        .globeImageUrl(imgTopo)
-        .bumpImageUrl(imgTopo)
-        .bumpAltitude(0.15)
-        .baseColor('#000033')
-        .showAtmosphere(true)
-        .atmosphereColor('lightskyblue')
-        .atmosphereAltitude(0.15);
+    // Set properties individually to avoid the TypeError
+    world.globeImageUrl(imgTopo);
+    world.bumpImageUrl(imgTopo);
+    world.bumpAltitude(0.15);
+    world.baseColor('#000033');
+    world.showAtmosphere(true);
+    world.atmosphereColor('lightskyblue');
+    world.atmosphereAltitude(0.15);
 
-      world.controls().autoRotate = true;
-      world.controls().autoRotateSpeed = 0.5;
+    // Controls
+    world.controls().autoRotate = true;
+    world.controls().autoRotateSpeed = 0.5;
 
-      // Start with Topo view
-      showTopo();
-    };
-  </script>
+    // Load initial legend
+    showTopo();
+  };
+</script>
 </body>
 </html>
