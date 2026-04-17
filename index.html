@@ -107,33 +107,36 @@
 
   // 2. The Initialization Fix
   window.onload = function() {
-    // Start the globe instance
     // 1. Create the instance
     world = Globe()(document.getElementById('globeViz'));
-    
-    // 2. Set properties individually
+
+    // 2. Set Properties one-by-one with safety checks
     world.globeImageUrl(imgTopo);
     world.bumpImageUrl(imgTopo);
     
-    // Use a simple try/catch or a standalone check for the altitude
-    try {
-        world.bumpAltitude(0.15);
-    } catch(e) {
-        console.warn("Could not set bump altitude, check library version.");
+    // Safety check for bumpAltitude
+    if (typeof world.bumpAltitude === 'function') {
+        try { world.bumpAltitude(0.15); } catch(e) { console.warn("Bump mapping skipped."); }
     }
-    
+
+    // Fix for the Atmosphere Warning: Use Hex instead of RGBA
     world.showAtmosphere(true);
-    world.atmosphereColor('rgba(255,255,255,0.5)'); // Soft white haze
-    world.atmosphereAltitude(0.1);
-    world.shininess(0.05); // Makes the globe surface slightly matte (better for rocks)
+    world.atmosphereColor('#ffffff'); // Pure white; the engine handles the "haze" fade
+    world.atmosphereAltitude(0.12);
 
-    // Controls
-    world.controls().autoRotate = true;
-    world.controls().autoRotateSpeed = 0.5;
+    // Aesthetics
+    world.baseColor('#000033'); // Deep space/ocean blue
+    
+    // 3. Controls
+    const controls = world.controls();
+    if (controls) {
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
+    }
 
-    // Load initial legend
-    showTopo();
-  };
+    // 4. Initial View
+    showTopo(); 
+};
 </script>
 </body>
 </html>
