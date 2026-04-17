@@ -16,10 +16,6 @@
 
   <script>
     const world = Globe()
-      world
-        .onGlobeClick(({ lat, lng }) => {
-            alert(`You clicked at Latitude: ${lat}, Longitude: ${lng}`);
-        });
       (document.getElementById('globeViz'))
       // This tells the globe to look for the file in your GitHub folder
       .globeImageUrl('./world_topo.jpg') 
@@ -27,6 +23,11 @@
       .showAtmosphere(true)
       .atmosphereColor('lightskyblue')
       .atmosphereAltitude(0.15);
+
+    world
+        .onGlobeClick(({ lat, lng }) => {
+            alert(`You clicked at Latitude: ${lat}, Longitude: ${lng}`);
+        });
 
     // Optional: Add auto-rotation
     world.controls().autoRotate = true;
