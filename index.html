@@ -2,37 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>3D Globe Test</title>
+  <title>Interactive Geological Globe</title>
   <style>
-    body { margin: 0; background: #000; }
+    body { margin: 0; background: #000; font-family: sans-serif; }
     #globeViz { width: 100vw; height: 100vh; }
+    
+    /* This styles the toggle button UI */
+    #controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border-radius: 8px;
+      border: 1px solid #444;
+      z-index: 10;
+    }
+    button {
+      cursor: pointer;
+      padding: 8px 12px;
+      background: #333;
+      color: white;
+      border: 1px solid #666;
+      border-radius: 4px;
+    }
+    button:hover { background: #555; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
 </head>
 <body>
+
+  <div id="controls">
+    <h3>Globe View</h3>
+    <button onclick="showTopo()">Satellite / Topo</button>
+    <button onclick="showRocks()">Rock Types (Lithology)</button>
+  </div>
+
   <div id="globeViz"></div>
 
   <script>
-  const world = Globe()
-    (document.getElementById('globeViz'))
-    // Try the "Guaranteed" link first to see it work
-    .globeImageUrl('world_topo.png')
-    .bumpImageUrl('world_topo.png')
-    .bumpAltitude(0.1)
-    .showAtmosphere(true)
-    .atmosphereColor('lightskyblue')
-    .atmosphereAltitude(0.15);
+    // Define our two image sets
+    const imgTopo = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
+    const imgRocks = 'https://unpkg.com/three-globe/example/img/earth-night.jpg'; // Swap with your rock_map.jpg later!
 
-  world.controls().autoRotate = true;
-  world.controls().autoRotateSpeed = 0.5;
+    // Initialize the Globe
+    const world = Globe()
+      (document.getElementById('globeViz'))
+      .globeImageUrl(imgTopo)
+      .bumpImageUrl(imgTopo)
+      .bumpAltitude(0.1)
+      .showAtmosphere(true)
+      .atmosphereColor('lightskyblue');
 
-  // This helps you see in the "Console" if things are working
-  console.log("The globe is attempting to load...");
+    world.controls().autoRotate = true;
 
-  // Add the click listener
-  world.onGlobeClick(({ lat, lng }) => {
-      alert(`Latitude: ${lat}, Longitude: ${lng}`);
-  });
-</script>
+    // Function to switch to Topography view
+    function showTopo() {
+      world.globeImageUrl(imgTopo);
+      console.log("Switched to Topo view");
+    }
+
+    // Function to switch to Rock Type view
+    function showRocks() {
+      // If you use your rock_map.jpg, ensure it's uploaded to GitHub!
+      world.globeImageUrl(imgRocks); 
+      console.log("Switched to Rock view");
+    }
+  </script>
 </body>
 </html>
