@@ -105,36 +105,29 @@
     }
   };
 
-  // 2. The Initialization Fix
   window.onload = function() {
-    // 1. Create the instance
     world = Globe()(document.getElementById('globeViz'));
 
-    // 2. Set Properties one-by-one with safety checks
+    // 1. Set the basic textures
     world.globeImageUrl(imgTopo);
     world.bumpImageUrl(imgTopo);
     
-    // Safety check for bumpAltitude
-    if (typeof world.bumpAltitude === 'function') {
-        try { world.bumpAltitude(0.15); } catch(e) { console.warn("Bump mapping skipped."); }
-    }
-
-    // Fix for the Atmosphere Warning: Use Hex instead of RGBA
+    // 2. The Fix: Use backgroundColor instead of baseColor
+    // This sets the color of the sphere itself
+    world.backgroundColor('#000000'); // Space is black
+    
+    // 3. Atmosphere settings (No RGBA to avoid Three.js warnings)
     world.showAtmosphere(true);
-    world.atmosphereColor('#ffffff'); // Pure white; the engine handles the "haze" fade
+    world.atmosphereColor('#ffffff'); 
     world.atmosphereAltitude(0.12);
 
-    // Aesthetics
-    world.baseColor('#000033'); // Deep space/ocean blue
-    
-    // 3. Controls
+    // 4. Initialization
     const controls = world.controls();
     if (controls) {
         controls.autoRotate = true;
         controls.autoRotateSpeed = 0.5;
     }
 
-    // 4. Initial View
     showTopo(); 
 };
 </script>
