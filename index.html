@@ -72,9 +72,8 @@
   }
 
   function showRocks() {
-    console.log("Switching to Rocks...");
-    world.globeImageUrl(imgRocks);
-    // We keep the topography bump so the rock map has texture
+  console.log("Loading custom GLiM texture...");
+  world.globeImageUrl('rock_map.png'); // Your exported QGIS file
     world.bumpImageUrl(imgTopo);
   }
 </script>
