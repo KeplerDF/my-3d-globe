@@ -13,17 +13,19 @@
   <div id="globeViz"></div>
 
   <script>
-  // Initialize the globe correctly
   const world = Globe()
     (document.getElementById('globeViz'))
+    // Try the "Guaranteed" link first to see it work
     .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
     .showAtmosphere(true)
     .atmosphereColor('lightskyblue')
     .atmosphereAltitude(0.15);
 
-  // Setup controls separately to avoid chaining errors
   world.controls().autoRotate = true;
   world.controls().autoRotateSpeed = 0.5;
+
+  // This helps you see in the "Console" if things are working
+  console.log("The globe is attempting to load...");
 
   // Add the click listener
   world.onGlobeClick(({ lat, lng }) => {
