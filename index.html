@@ -2,35 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Topographic Globe</title>
+  <title>3D Globe Test</title>
   <style>
-    body { margin: 0; overflow: hidden; background-color: #000; }
+    body { margin: 0; background: #000; }
     #globeViz { width: 100vw; height: 100vh; }
   </style>
-  <script src="https://unpkg.com/globe.gl"></script>
+  <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
 </head>
 <body>
-
   <div id="globeViz"></div>
 
   <script>
-    const world = Globe()
-      (document.getElementById('globeViz'))
-      // This looks for the image in the SAME folder as this HTML file
-      .globeImageUrl('https://vasturiano.github.io/globe.gl/example/img/earth-topology.png')
-      .backgroundColor('#000011')
+    // 1. Initialize the globe
+    const myGlobe = Globe();
+
+    // 2. Configure it
+    myGlobe(document.getElementById('globeViz'))
+      // Use a solid color first to see if it renders
+      .globeColor('#333333') 
+      // Use a reliable, standard Earth image
+      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .showAtmosphere(true)
-      .atmosphereColor('lightskyblue')
-      .atmosphereAltitude(0.15);
+      .atmosphereColor('lightskyblue');
 
-    world.onGlobeClick(({ lat, lng }) => {
-        alert(`You clicked at Latitude: ${lat}, Longitude: ${lng}`);
-    });
+    // 3. Add movement
+    myGlobe.controls().autoRotate = true;
+    myGlobe.controls().autoRotateSpeed = 0.5;
 
-    world.controls().autoRotate = true;
-    world.controls().autoRotateSpeed = 0.5;
+    console.log("Globe script finished loading!");
   </script>
-
 </body>
 </html>
